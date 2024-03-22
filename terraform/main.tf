@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "thuy-s3bucket-aws"
+    bucket = "thuy-s3bucket-terraform-maunal"
     key    = "terraform/tf.state"
     region = "us-east-1"
   }
