@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "example" {
-  bucket = "thuy-s3bucket-aws" #update your account here
+  bucket = "thuyho-s3bucket-aws" #update your account here
   tags = {
     Name        = "My bucket"
     Environment = "Dev"
