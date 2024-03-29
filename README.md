@@ -50,23 +50,25 @@ Data testing with AWS CodeBuild, through buildspec.yml, automates application bu
 #### 📌 HW: GitHub Action successful: 5/5 tests passed, deployed to S3 bucket on AWS.
 #### 🔥Steps:
 > 1. Create a GitHub Repository
-> 2. Create `dev` branch
-> 3. Create `secret key` on AWS to get credential that allow deployment
-> 4. Configure `secret key` to prepare for deployment
+> 2. Create `dev` branch: `git checkout -b dev`
+> 3. Create AWS Secret Key to get credential that allow deployment
+>   - Creat `secret key` (AWS): AWS > Profile > Security Credentials > Create Access key > Download the access key ID and secret access key for this user securely
+>   - _Once you close the screen that shows your `Access Key ID` and `Secret Access Key`, you will not be able to retrieve the `Secret access key` value again. The solution is to _delete the old credentials_, _generate new ones_ and *save the .csv file on your local file system*_.  (_Region=us-east-1_)
+>   - **Crucially**: Don't store your AWS credentials directly in your code or configuration files. Use AWS Secrets Manager to create a secret that securely stores your AWS access key and secret key.
+>     - <img src="image\AWS_creatSecretKey.png" alt="alt text" width="650"/>
+>
+> 4. Configure Secret Key for Deployment (Recommended - Environment Variables)
+>   - If you plan to automate deployments using GitHub Actions, you can create secrets in your GitHub repository settings:
+>     - Go to your repository's Settings > Secrets.
+>     - Create secrets named `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`,`AWS_REGION` storing the respective values from step 3.
+>     - <img src="image\GitHub_configSecretKey.png" alt="alt text" width="650"/>
+> - **Alternatively**: You can store the credentials in environment variables managed by your CI/CD platform (e.g., AWS CodePipeline, CircleCI, etc.).
 > 5. Clone code 
-> - `terraform/main.tf`: _Manual AWS S3 bucket creation_ needed for Terraform backend.
-> - `terraform/s3.tf`  (assumed): Hardcoded bucket name requires updates each deployment.
+> - `terraform/main.tf`: contains Terraform code for creating and managing your infrastructure
+> - `terraform/s3.tf`  (assumed):  contain Terraform code that directly references a hardcoded bucket name.
 > 6. Push code and deploy on `dev` branch
 > 7. Verify CICD on GitHub
-> ### Creat secret key (AWS)
-> AWS > Profile > Security Credentials > Create Access key.
->
-> _Once you close the screen that shows your `Access Key ID` and `Secret Access Key`, you will not be able to retrieve the `Secret access key` value again. The solution is to _delete the old credentials_, _generate new ones_ and *save the .csv file on your local file system*_.  (_Region=us-east-1_)
-> <img src="image\AWS_creatSecretKey.png" alt="alt text" width="650"/>
->
-> ### Configure secret key (GitHub)
-> <img src="image\GitHub_configSecretKey.png" alt="alt text" width="650"/>
-> 
+ 
 ### Data pipeline testing workflow using AWS services
 > <img src="image\workflow_DataPipelineAWS.png" alt="alt text" width="850"/>
 
@@ -86,7 +88,81 @@ Data testing with AWS CodeBuild, through buildspec.yml, automates application bu
 > 4. **Report Flow**: Stores results and sends notifications to `Slack`.
 > 5. **Monitoring**: Monitors the pipeline  and sent alert if issues arise.
 # [CICD: Terraform](#2)
-**
+## Terraform config
+This block defines settings specific to your Terraform configuration.
+```
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "5.17.0"
+    }
+  }
+
+  backend "s3" {
+    bucket = "thuy-s3bucket-terraform-maunal"
+    key    = "terraform/tf.state"
+    region  = "us-east-1"
+  }
+}
+
+provider "aws" {}
+```
+  > **1. Required Providers**
+  > - Terraform needs the aws provider (from HashiCorp) to interact with AWS services.
+  > - You've specified the official HashiCorp AWS provider (version 5.17.0).
+  > - Keeping providers up-to-date is recommended, but fixing the version can ensure consistency.
+  >
+  > **2. Remote State Storage (S3):**
+  > - Terraform stores its state (`tf.state`) file in an S3 bucket for remote access.
+  > - The bucket (`thuy-s3bucket-terraform-manual`) needs to be created manually in AWS.
+  > - The state file is stored within a `terraform` folder inside the bucket.
+  >
+  > **3. Empty AWS Provider Block:**
+  > - This block defines how to interact with AWS services.
+  > - Since `aws` is already declared as a required provider, this block is a placeholder and doesn't need further configuration in this case.
+## Terraform code 
+**1. Creating the S3 Bucket:**
+```Terraform
+resource "aws_s3_bucket" "example" {
+  bucket = "thuy-s3bucket-aws"
+  tags = {
+    Name    = "My bucket"
+    Environment = "Dev"
+  }
+}
+```
+  > - This block creates an S3 bucket named `thuy-s3bucket-aws` in your AWS account.
+  > - It adds two tags for organization:
+  >   - `Name = "My bucket"`: A human-readable name for easy identification.
+  >   - `Environment = "Dev"`: Indicates the purpose (dev) of the bucket.
+**2. Configuring Bucket Ownership Controls:**
+```Terraform
+resource "aws_s3_bucket_ownership_controls" "example" {
+  bucket = aws_s3_bucket.example.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+```
+  > - This block establishes ownership controls for the bucket:
+  >   -  `bucket`: It links to the previously created bucket (`aws_s3_bucket.example.id`).
+  >   -  `rule`: Sets a rule for object ownership:
+  >   -  `object_ownership = "BucketOwnerPreferred"`: New objects uploaded with the "bucket-owner-full-control" canned ACL will automatically assume bucket owner ownership
+
+**3. Setting Access Control List (ACL):**
+```Terraform
+resource "aws_s3_bucket_acl" "example" {
+  depends_on = [aws_s3_bucket_ownership_controls.example]
+
+  bucket = aws_s3_bucket.example.id
+  acl    = "private"
+}
+```
+  > - This blocks applies an ACL to the bucket:
+  >   - `depends_on`: Ensures the ownership controls are applied before the ACL.
+  >   - `bucket`: Again references the created bucket.
+  >   - `acl = "private"`: Sets the ACL to private, restricting access to only the bucket owner.
 # [Data quality: accuracy, completeness, consistency, uniqueness, and timeliness](#3)
 **
 # [Data validation: range check, cross check, structure check...](#5)
