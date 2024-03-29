@@ -1,3 +1,4 @@
+# Configuration for Terraform
 terraform {
   required_providers {
     aws = {
@@ -5,11 +6,11 @@ terraform {
       version = "5.17.0"
     }
   }
-
+  # Remote State Storage
   backend "s3" {
-    bucket = "thuy-s3bucket-terraform-maunal"
-    key    = "terraform/tf.state"
-    region = "us-east-1"
+    bucket = "thuy-s3bucket-terraform-maunal" #Name of the S3 bucket (manually created in your AWS account beforehand)
+    key    = "terraform/tf.state"             #Path within the bucket to store the state file
+    region = "us-east-1"                      
   }
 }
 
