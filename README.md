@@ -5,7 +5,7 @@
 <p align="center">
 Data testing with AWS CodeBuild, through buildspec.yml, automates application builds and deployments within a CI/CD pipeline, similar to Terraform's infrastructure automation. Data quality remains crucial, demanding accuracy, completeness, consistency, uniqueness, and timeliness. Techniques like data validation (range checks, cross checks, structure checks) ensure this quality.
 </p>
-  🛠 💻 🚀 ⚡️🔥❇️📌
+  🔖🏷️📜📃🛠 💻 💾💡📕📗📙📓📩📝📅📂🗂️📈📈🔒🚀 ⚡️🔥❇️📌💢💫👉👈👇👆✍️🎯
 
 ## Table of contents
 - [Prerequisites](#pre)
@@ -20,6 +20,12 @@ Data testing with AWS CodeBuild, through buildspec.yml, automates application bu
   - [Data quality: accuracy, completeness, consistency, uniqueness, and timeliness](#3)
   - [Techniques for assessing data quality](#4)
   - [Data validation: range check, cross check, structure check...](#5)
+- [Reference](#ref)
+  - [AWS Code build](https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html)
+  - [Terraform: aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket)
+  - [Terraform:aws_codebuild_project](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/codebuild_project) 
+
+ 
 
 
 # [AWS Codebuild: Define buildspec .yml](#1)
@@ -47,21 +53,22 @@ Data testing with AWS CodeBuild, through buildspec.yml, automates application bu
 > 2. Create `dev` branch
 > 3. Create `secret key` on AWS to get credential that allow deployment
 > 4. Configure `secret key` to prepare for deployment
-> 5. Clone code
+> 5. Clone code 
+> - `terraform/main.tf`: _Manual AWS S3 bucket creation_ needed for Terraform backend.
+> - `terraform/s3.tf`  (assumed): Hardcoded bucket name requires updates each deployment.
 > 6. Push code and deploy on `dev` branch
 > 7. Verify CICD on GitHub
-> #### Creat secret key (AWS)
-> AWS > Profile > Security Credentials > Create Access key
-> _Once you close the screen that shows your `Access Key ID` and `Secret Access Key`, you will not be able to retrieve the `Secret access key` value again. The solution is to _delete the old credentials_, _generate new ones_ and *save the .csv file on your local file system*.
-> <img src="image\AWS_creatSecretKey.png" alt="alt text" width="650"/>
+> ### Creat secret key (AWS)
+> AWS > Profile > Security Credentials > Create Access key.
 >
-> _Region=us-east-1_
+> _Once you close the screen that shows your `Access Key ID` and `Secret Access Key`, you will not be able to retrieve the `Secret access key` value again. The solution is to _delete the old credentials_, _generate new ones_ and *save the .csv file on your local file system*_.  (_Region=us-east-1_)
+> <img src="image\AWS_creatSecretKey.png" alt="alt text" width="650"/>
 >
 > ### Configure secret key (GitHub)
 > <img src="image\GitHub_configSecretKey.png" alt="alt text" width="650"/>
 > 
 ### Data pipeline testing workflow using AWS services
-> <img src="image\workflow_DataPipelineAWS.png" alt="alt text" width="650"/>
+> <img src="image\workflow_DataPipelineAWS.png" alt="alt text" width="850"/>
 
 ⚡️**4-Stage Automated Testing Pipeline for Cloud Data Processing:**
 > 1. **Trigger**: Schedule (hourly/weekly) or Github code changes.
