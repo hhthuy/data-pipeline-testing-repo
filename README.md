@@ -9,11 +9,6 @@ Data testing with AWS CodeBuild, through buildspec.yml, automates application bu
 
 ## Table of contents
 - [Prerequisites](#pre)
-  - [Git](#git)
-  - [AWS Account](#aws)
-  - [Snowflake](#snowflake)
-  - [VSCode](#browser)
-  - [Git Grap Extention](#gitgrap)
 - [Setup](#setup)
   - [AWS Codebuild: Define buildspec .yml](#1)
   - [CICD: Terraform](#2)
@@ -26,8 +21,12 @@ Data testing with AWS CodeBuild, through buildspec.yml, automates application bu
   - [Terraform:aws_codebuild_project](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/codebuild_project) 
 
  
-
-
+# [Prerequisites](#pre)
+  - [Git](#git)
+  - [AWS Account](#aws)
+  - [Snowflake](#snowflake)
+  - [VSCode](#browser)
+  - [Git Grap Extention](#gitgrap)
 # [AWS Codebuild: Define buildspec .yml](#1)
 ### GitHub Actions to automate infrastructure on  AWS with Terraform
 <img src="image\workflow_GitHubActions_AWS_Terraform.png" alt="alt text" width="650"/>
@@ -90,7 +89,7 @@ Data testing with AWS CodeBuild, through buildspec.yml, automates application bu
 # [CICD: Terraform](#2)
 ## Terraform config
 This block defines settings specific to your Terraform configuration.
-```
+```terraform 
 terraform {
   required_providers {
     aws = {
